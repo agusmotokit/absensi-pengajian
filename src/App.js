@@ -1,11 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { initializeApp } from "firebase/app";
-import {
-  getAuth,
-  signInAnonymously,
-  signInWithCustomToken,
-  onAuthStateChanged,
-} from "firebase/auth";
+import { getAuth, signInAnonymously, onAuthStateChanged } from "firebase/auth";
 import {
   getFirestore,
   doc,
@@ -17,7 +12,6 @@ import {
   query,
   where,
   orderBy,
-  limit,
   getDocs,
   deleteDoc,
   updateDoc,
@@ -32,25 +26,27 @@ import {
   X,
   Edit,
   Trash2,
-  Download,
   CheckCircle,
   Info,
   Loader,
   XCircle,
 } from "lucide-react";
 
-// --- Konfigurasi Firebase (Diperbaiki untuk Deployment) ---
-// Kode ini sekarang akan mencoba membaca konfigurasi dari environment variables
-// yang akan kita siapkan untuk versi online.
-const firebaseConfig = process.env.REACT_APP_FIREBASE_CONFIG
-  ? JSON.parse(process.env.REACT_APP_FIREBASE_CONFIG)
-  : typeof __firebase_config !== "undefined"
-  ? JSON.parse(__firebase_config)
-  : {};
+// --- Konfigurasi Firebase (Ditempatkan Langsung di Sini) ---
+// Cara ini paling pasti untuk deployment di GitHub Pages.
+// Pastikan Security Rules di Firebase Console sudah Anda atur.
+const firebaseConfig = {
+  apiKey: "AIzaSyCQk2Q0Y_kotZ91V4th-hx1C5NVs4M9fSI",
+  authDomain: "absensi-tpq-ku.firebaseapp.com",
+  projectId: "absensi-tpq-ku",
+  storageBucket: "absensi-tpq-ku.appspot.com",
+  messagingSenderId: "749561123997",
+  appId: "1:749561123997:web:d1d6a89f10eea11044f074",
+  measurementId: "G-72WWMYFM9Q",
+};
 
-const appId =
-  process.env.REACT_APP_APP_ID ||
-  (typeof __app_id !== "undefined" ? __app_id : "default-absensi-app-v2");
+// ID unik untuk memisahkan data aplikasi ini di database.
+const appId = "absensi-pengajian-online";
 
 // --- Komponen Pengganti untuk Membuat QR Code ---
 const QRCodeGenerator = ({ value, size }) => {
@@ -163,11 +159,10 @@ const QRScanner = ({ onScanSuccess }) => {
 export default function App() {
   // --- State Management ---
   const [db, setDb] = useState(null);
-  const [auth, setAuth] = useState(null);
   const [isAuthReady, setIsAuthReady] = useState(false);
   const [currentDateTime, setCurrentDateTime] = useState(new Date());
 
-  const [currentView, setCurrentView] = useState("attendance"); // 'attendance', 'management'
+  const [currentView, setCurrentView] = useState("attendance");
   const [students, setStudents] = useState([]);
   const [attendanceLog, setAttendanceLog] = useState([]);
   const [notification, setNotification] = useState(null);
@@ -189,7 +184,6 @@ export default function App() {
 
   // --- Inisialisasi Firebase & Autentikasi ---
   useEffect(() => {
-    // Cek jika firebaseConfig kosong, jangan lakukan apa-apa
     if (!firebaseConfig || Object.keys(firebaseConfig).length === 0) {
       console.error("Firebase config is missing!");
       setNotification({
@@ -203,19 +197,11 @@ export default function App() {
       const firestoreDb = getFirestore(app);
       const firebaseAuth = getAuth(app);
       setDb(firestoreDb);
-      setAuth(firebaseAuth);
 
       const unsubscribe = onAuthStateChanged(firebaseAuth, async (user) => {
         if (!user) {
           try {
-            if (
-              typeof __initial_auth_token !== "undefined" &&
-              __initial_auth_token
-            ) {
-              await signInWithCustomToken(firebaseAuth, __initial_auth_token);
-            } else {
-              await signInAnonymously(firebaseAuth);
-            }
+            await signInAnonymously(firebaseAuth);
           } catch (error) {
             console.error("Authentication Error:", error);
           }
@@ -238,7 +224,7 @@ export default function App() {
     return () => clearInterval(timer);
   }, []);
 
-  // --- Pengambilan Data Real-time (Siswa & Riwayat Absen) ---
+  // --- Pengambilan Data Real-time ---
   useEffect(() => {
     if (!isAuthReady || !db) return;
 
@@ -282,7 +268,7 @@ export default function App() {
       unsubscribeStudents();
       unsubscribeAttendance();
     };
-  }, [isAuthReady, db, appId]);
+  }, [isAuthReady, db]);
 
   // --- Timer Notifikasi ---
   useEffect(() => {
@@ -297,7 +283,6 @@ export default function App() {
     async (decodedText) => {
       if (decodedText && !isProcessingScan) {
         setIsProcessingScan(true);
-
         const student = students.find((s) => s.studentId === decodedText);
         if (!student) {
           setNotification({
@@ -354,10 +339,10 @@ export default function App() {
         }
       }
     },
-    [isProcessingScan, students, db, appId]
+    [isProcessingScan, students, db]
   );
 
-  // --- Fungsi Manajemen Siswa (CRUD) ---
+  // --- Fungsi Manajemen Jamaah (CRUD) ---
   const handleOpenStudentModal = (student = null) => {
     setEditingStudent(student);
     setNewStudentName(student ? student.name : "");
@@ -490,15 +475,15 @@ export default function App() {
       });
       setReportData(processedData);
     }
-  }, [db, appId, reportType, selectedDate, selectedMonth, students]);
+  }, [db, reportType, selectedDate, selectedMonth, students]);
 
   useEffect(() => {
     if (isAuthReady) {
       generateReport();
     }
-  }, [isAuthReady, generateReport]);
+  }, [isAuthReady, generateReport, reportType, selectedDate, selectedMonth]);
 
-  // --- Komponen Render ---
+  // --- Komponen Tampilan ---
   const AttendanceView = () => (
     <div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start mb-8">
@@ -673,6 +658,12 @@ export default function App() {
             className="bg-white dark:bg-slate-600 p-2 rounded-md border border-slate-300 dark:border-slate-500"
           />
         )}
+        <button
+          onClick={generateReport}
+          className="flex items-center gap-2 bg-slate-200 dark:bg-slate-600 px-4 py-2 rounded-lg shadow-sm hover:bg-slate-300 dark:hover:bg-slate-500 transition"
+        >
+          Lihat Laporan
+        </button>
       </div>
       <div className="overflow-x-auto">
         {reportType === "daily" && (
@@ -768,7 +759,16 @@ export default function App() {
               ))}
               {reportData.length === 0 && (
                 <tr>
-                  <td colSpan={34} className="text-center p-8 text-slate-500">
+                  <td
+                    colSpan={
+                      new Date(
+                        selectedMonth.split("-")[0],
+                        selectedMonth.split("-")[1],
+                        0
+                      ).getDate() + 3
+                    }
+                    className="text-center p-8 text-slate-500"
+                  >
                     Tidak ada data.
                   </td>
                 </tr>
