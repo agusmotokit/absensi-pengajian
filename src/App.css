@@ -1,38 +1,201 @@
-.App {
-  text-align: center;
+/* General Body Styling */
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #f1f5f9; /* slate-100 */
+  color: #1e293b; /* slate-800 */
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+/* Main App Container */
+.app-container {
+  max-width: 1152px; /* max-w-6xl */
+  margin-left: auto;
+  margin-right: auto;
+  padding: 1.5rem; /* p-6 */
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+/* Header Styling */
+.app-header {
+  margin-bottom: 2rem;
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
+}
+
+@media (min-width: 640px) {
+  .app-header {
+    flex-direction: row;
+    align-items: center;
+  }
+}
+
+.header-title h1 {
+  font-size: 2.25rem; /* text-4xl */
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  color: #0f172a; /* slate-900 */
+}
+
+.header-title p {
+  margin-top: 0.5rem;
+  font-size: 1.125rem; /* text-lg */
+  color: #475569; /* slate-600 */
+}
+
+.date-time-box {
+  margin-top: 1rem;
+  text-align: right;
+  background-color: white;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+}
+
+@media (min-width: 640px) {
+  .date-time-box {
+    margin-top: 0;
+  }
+}
+
+.date-time-box .time {
+  font-size: 1.5rem; /* text-2xl */
+  font-weight: 600;
+  color: #4f46e5; /* indigo-600 */
+}
+.date-time-box .date {
+  margin-top: 0.25rem;
+  color: #64748b; /* slate-500 */
+}
+
+/* Navigation Tabs */
+.app-nav {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+  background-color: white;
+  padding: 0.5rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+}
+
+.app-nav button {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  display: flex;
   align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
+  gap: 0.5rem;
+  transition: all 0.2s ease-in-out;
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.app-nav button:hover {
+  background-color: #f1f5f9; /* slate-100 */
+}
+
+.app-nav button.active {
+  background-color: #4f46e5; /* indigo-600 */
   color: white;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
 }
 
-.App-link {
-  color: #61dafb;
+/* General Card Styling */
+.card {
+  background-color: white;
+  padding: 1.5rem;
+  border-radius: 1rem;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
+.card-title {
+  font-size: 1.5rem; /* text-2xl */
+  font-weight: 700;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: #4f46e5; /* indigo-500 */
+}
+
+/* Layout Grid */
+.main-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+@media (min-width: 1024px) {
+  .main-grid {
+    grid-template-columns: 1fr 1fr;
+    align-items: flex-start;
   }
-  to {
-    transform: rotate(360deg);
-  }
+}
+
+/* QR Scanner Box */
+.scanner-box {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background-color: #0f172a; /* slate-900 */
+  border-radius: 0.5rem;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Fix for QR Reader video element */
+#reader video {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover;
+}
+
+/* History List */
+.history-item {
+  background-color: #f1f5f9;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.history-item .name {
+  font-weight: 600;
+  color: #1e293b;
+}
+.history-item .id {
+  font-size: 0.875rem;
+  color: #64748b;
+}
+
+.history-item .time {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #475569;
+}
+
+/* General Button */
+.button-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: #4f46e5;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.button-primary:hover {
+  background-color: #4338ca;
 }
